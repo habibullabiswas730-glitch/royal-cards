@@ -214,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 14), const Text('Virtual coins only • No real-money wagering', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12)),
       ]))),
     ),
-  );
+  ));
 }
 
 class MainShell extends StatefulWidget {
@@ -256,7 +256,7 @@ class LobbyPage extends StatelessWidget {
     const SizedBox(height: 15),
     Row(children: [Expanded(child: QuickTile(icon: Icons.public, label: 'ONLINE', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OnlinePage(state: state))))), Expanded(child: QuickTile(icon: Icons.people, label: 'INVITE', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FriendsPage(state: state))))), Expanded(child: QuickTile(icon: Icons.account_balance_wallet_outlined, label: 'WALLET', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => WalletPage(state: state)))))]),
     const SizedBox(height: 18),
-    const Padding(padding: EdgeInsets.symmetric(horizontal: 18), child: Align(alignment: Alignment.centerLeft, child: Text('Choose a game', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),
+    const Padding(padding: EdgeInsets.symmetric(horizontal: 18), child: Align(alignment: Alignment.centerLeft, child: Text('Choose a game', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)))),
     const SizedBox(height: 10),
     ...GameType.values.map((g) => GameModeCard(game: g, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OnlineGamePage(state: state, game: g))))),
     const SizedBox(height: 20),
@@ -285,52 +285,331 @@ class OnlinePage extends StatelessWidget {
 class RoomTile extends StatelessWidget { final AppState state; final Room room; const RoomTile({super.key, required this.state, required this.room}); @override Widget build(BuildContext context) => Card(child: ListTile(leading: CircleAvatar(child: Icon(room.game.icon)), title: Text('${room.game.title} • ${room.id}'), subtitle: Text('${room.players.length}/${room.seats} players • Host: ${room.host}'), trailing: FilledButton(onPressed: () { state.joinRoom(room); Navigator.push(context, MaterialPageRoute(builder: (_) => RoomPage(state: state, room: room))); }, child: const Text('JOIN')))); }
 
 class OnlineGamePage extends StatelessWidget {
-  final AppState state; final GameType game;
+  final AppState state;
+  final GameType game;
+
   const OnlineGamePage({super.key, required this.state, required this.game});
-  @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(game.title)), body: ListView(padding: const EdgeInsets.all(18), children: [
-    GameModeCard(game: game, onTap: () {}),
-    const SizedBox(height: 10),
-    SizedBox(height: 54, child: FilledButton.icon(onPressed: () { final room = state.createRoom(game); Navigator.push(context, MaterialPageRoute(builder: (_) => RoomPage(state: state, room: room))); }, icon: const Icon(Icons.add_circle_outline), label: const Text('CREATE ONLINE ROOM'))),
-    const SizedBox(height: 12),
-    SizedBox(height: 54, child: OutlinedButton.icon(onPressed: () { final room = state.createRoom(game); state.joinRoom(room); Navigator.push(context, MaterialPageRoute(builder: (_) => RoomPage(state: state, room: room))); }, icon: const Icon(Icons.flash_on), label: const Text('QUICK MATCH'))),
-    const SizedBox(height: 22),
-    const Text('Invite a friend', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-    const SizedBox(height: 8),
-    ...state.friends.map((f) => Card(child: ListTile(leading: CircleAvatar(child: Text(f.name.substring(0, 1))), title: Text(f.name), subtitle: Text(f.online ? 'Online' : 'Offline'), trailing: FilledButton(onPressed: () => _invite(context, f.name), child: const Text('INVITE')))),
-  ]));
-  void _invite(BuildContext context, String friend) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invite sent to $friend for ${game.title}'))); }
+
+  @override
+  Widget build(BuildContext context) {
+    final friendCards = state.friends.map((friend) {
+      return Card(
+        child: ListTile(
+          leading: CircleAvatar(child: Text(friend.name.substring(0, 1))),
+          title: Text(friend.name),
+          subtitle: Text(friend.online ? 'Online' : 'Offline'),
+          trailing: FilledButton(
+            onPressed: () => _invite(context, friend.name),
+            child: const Text('INVITE'),
+          ),
+        ),
+      );
+    }).toList();
+
+    return Scaffold(
+      appBar: AppBar(title: Text(game.title)),
+      body: ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          GameModeCard(game: game, onTap: () {}),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 54,
+            child: FilledButton.icon(
+              onPressed: () {
+                final room = state.createRoom(game);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RoomPage(state: state, room: room),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add_circle_outline),
+              label: const Text('CREATE ONLINE ROOM'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 54,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                final room = state.createRoom(game);
+                state.joinRoom(room);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RoomPage(state: state, room: room),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.flash_on),
+              label: const Text('QUICK MATCH'),
+            ),
+          ),
+          const SizedBox(height: 22),
+          const Text(
+            'Invite a friend',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 8),
+          ...friendCards,
+        ],
+      ),
+    );
+  }
+
+  void _invite(BuildContext context, String friend) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Invite sent to $friend for ${game.title}')),
+    );
+  }
 }
 
-class RoomPage extends StatefulWidget { final AppState state; final Room room; const RoomPage({super.key, required this.state, required this.room}); @override State<RoomPage> createState() => _RoomPageState(); }
+class RoomPage extends StatefulWidget {
+  final AppState state;
+  final Room room;
+
+  const RoomPage({super.key, required this.state, required this.room});
+
+  @override
+  State<RoomPage> createState() => _RoomPageState();
+}
+
 class _RoomPageState extends State<RoomPage> {
-  @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text('${widget.room.game.title} Room')), body: ListView(padding: const EdgeInsets.all(18), children: [
-    Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(gradient: const LinearGradient(colors: [C.redDark, C.red]), borderRadius: BorderRadius.circular(20)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(widget.room.id, style: const TextStyle(color: Colors.white70)), const SizedBox(height: 4), Text(widget.room.game.title, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)), const SizedBox(height: 8), Text('${widget.room.players.length}/${widget.room.seats} players', style: const TextStyle(color: Colors.white70))])),
-    const SizedBox(height: 18),
-    const Text('Players', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-    ...widget.room.players.map((p) => Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: Text(p), trailing: const Icon(Icons.check_circle, color: C.green)))),
-    const SizedBox(height: 14),
-    SizedBox(height: 54, child: FilledButton.icon(onPressed: () => _start(context), icon: const Icon(Icons.play_arrow), label: const Text('START GAME'))),
-    const SizedBox(height: 10),
-    OutlinedButton.icon(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Room invite link copied'))); }, icon: const Icon(Icons.share), label: const Text('INVITE / SHARE ROOM')),
-  ]));
-  void _start(BuildContext context) => Navigator.push(context, MaterialPageRoute(builder: (_) => TablePage(state: widget.state, room: widget.room)));
+  @override
+  Widget build(BuildContext context) {
+    final playerCards = widget.room.players.map((player) {
+      return Card(
+        child: ListTile(
+          leading: const CircleAvatar(child: Icon(Icons.person)),
+          title: Text(player),
+          trailing: const Icon(Icons.check_circle, color: C.green),
+        ),
+      );
+    }).toList();
+
+    return Scaffold(
+      appBar: AppBar(title: Text('${widget.room.game.title} Room')),
+      body: ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [C.redDark, C.red]),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.room.id, style: const TextStyle(color: Colors.white70)),
+                const SizedBox(height: 4),
+                Text(
+                  widget.room.game.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${widget.room.players.length}/${widget.room.seats} players',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Players',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
+          ...playerCards,
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 54,
+            child: FilledButton.icon(
+              onPressed: () => _start(context),
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('START GAME'),
+            ),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Room invite link copied')),
+              );
+            },
+            icon: const Icon(Icons.share),
+            label: const Text('INVITE / SHARE ROOM'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _start(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TablePage(state: widget.state, room: widget.room),
+      ),
+    );
+  }
 }
 
-class TablePage extends StatefulWidget { final AppState state; final Room room; const TablePage({super.key, required this.state, required this.room}); @override State<TablePage> createState() => _TablePageState(); }
+class TablePage extends StatefulWidget {
+  final AppState state;
+  final Room room;
+
+  const TablePage({super.key, required this.state, required this.room});
+
+  @override
+  State<TablePage> createState() => _TablePageState();
+}
+
 class _TablePageState extends State<TablePage> {
-  int turn = 0; int selected = -1; bool ended = false;
-  final cards = const ['A♠','K♥','7♦','Q♣','3♠','10♥','9♦','J♣','2♥','8♠','4♦','6♣','5♥'];
-  Future<void> action() async { if (selected < 0) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Select a card first'))); return; } await widget.state.reward(10); setState(() { turn++; ended = true; }); }
-  @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: Text(widget.room.game.title)), body: Column(children: [
-    Container(color: C.redSoft, padding: const EdgeInsets.all(14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Room ${widget.room.id}', style: const TextStyle(fontWeight: FontWeight.bold)), Text('Turn $turn', style: const TextStyle(color: C.red, fontWeight: FontWeight.bold))])),
-    const SizedBox(height: 10),
-    Row(mainAxisAlignment: MainAxisAlignment.center, children: widget.room.players.map((p) => Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Chip(avatar: const Icon(Icons.person, size: 16), label: Text(p)))).toList()),
-    const SizedBox(height: 10),
-    Text(ended ? 'Turn complete • +10 virtual coins' : 'Your turn — select a card', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-    const SizedBox(height: 12),
-    Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(14), child: Wrap(spacing: 8, runSpacing: 8, children: List.generate(cards.length, (i) => GestureDetector(onTap: () => setState(() { selected = i; ended = false; }), child: AnimatedContainer(duration: const Duration(milliseconds: 120), width: 72, height: 100, alignment: Alignment.center, decoration: BoxDecoration(color: selected == i ? C.redSoft : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: selected == i ? C.red : Colors.black12, width: 2), boxShadow: [BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 5)]), child: Text(cards[i], style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: [1,3,5,8,12].contains(i) ? Colors.red : C.ink))))))),
-    Padding(padding: const EdgeInsets.all(18), child: SizedBox(width: double.infinity, height: 54, child: FilledButton(onPressed: action, child: const Text('PLAY TURN')))),
-  ]));
+  int turn = 0;
+  int selected = -1;
+  bool ended = false;
+
+  final cards = const [
+    'A♠', 'K♥', '7♦', 'Q♣', '3♠', '10♥', '9♦',
+    'J♣', '2♥', '8♠', '4♦', '6♣', '5♥',
+  ];
+
+  Future<void> action() async {
+    if (selected < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a card first')),
+      );
+      return;
+    }
+
+    await widget.state.reward(10);
+    setState(() {
+      turn++;
+      ended = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cardWidgets = List.generate(cards.length, (i) {
+      final isRed = [1, 3, 5, 8, 12].contains(i);
+      final isSelected = selected == i;
+
+      return GestureDetector(
+        onTap: () => setState(() {
+          selected = i;
+          ended = false;
+        }),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          width: 72,
+          height: 100,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? C.redSoft : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? C.red : Colors.black12,
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.08),
+                blurRadius: 5,
+              ),
+            ],
+          ),
+          child: Text(
+            cards[i],
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isRed ? Colors.red : C.ink,
+            ),
+          ),
+        ),
+      );
+    });
+
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.room.game.title)),
+      body: Column(
+        children: [
+          Container(
+            color: C.redSoft,
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Room ${widget.room.id}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Turn $turn',
+                  style: const TextStyle(
+                    color: C.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: widget.room.players
+                .map(
+                  (player) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Chip(
+                      avatar: const Icon(Icons.person, size: 16),
+                      label: Text(player),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            ended
+                ? 'Turn complete • +10 virtual coins'
+                : 'Your turn — select a card',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(14),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: cardWidgets,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: FilledButton(
+                onPressed: action,
+                child: const Text('PLAY TURN'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class FriendsPage extends StatefulWidget { final AppState state; const FriendsPage({super.key, required this.state}); @override State<FriendsPage> createState() => _FriendsPageState(); }
@@ -343,7 +622,55 @@ class WalletPage extends StatelessWidget { final AppState state; const WalletPag
 class MenuPage extends StatelessWidget { final AppState state; const MenuPage({super.key, required this.state}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Menu')), body: ListView(children: [const SizedBox(height: 10), ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: Text(state.player, style: const TextStyle(fontWeight: FontWeight.bold)), subtitle: Text('${state.coins} virtual coins')), const Divider(), MenuItem(icon: Icons.person_outline, text: 'Profile & Account', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(state: state)))), MenuItem(icon: Icons.public, text: 'Online Games', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OnlinePage(state: state)))), MenuItem(icon: Icons.account_balance_wallet_outlined, text: 'Wallet', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => WalletPage(state: state)))), MenuItem(icon: Icons.admin_panel_settings_outlined, text: 'Admin', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage(state: state)))), MenuItem(icon: Icons.settings_outlined, text: 'Settings', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage(state: state)))), MenuItem(icon: Icons.logout, text: 'Log out', onTap: () async => state.logout())])); }
 class MenuItem extends StatelessWidget { final IconData icon; final String text; final VoidCallback onTap; const MenuItem({super.key, required this.icon, required this.text, required this.onTap}); @override Widget build(BuildContext context) => ListTile(leading: Icon(icon, color: C.red), title: Text(text), trailing: const Icon(Icons.chevron_right), onTap: onTap); }
 
-class ProfilePage extends StatelessWidget { final AppState state; const ProfilePage({super.key, required this.state}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Profile & Account')), body: ListView(padding: const EdgeInsets.all(18), children: [const SizedBox(height: 16), const CircleAvatar(radius: 45, backgroundColor: C.redSoft, child: Icon(Icons.person, color: C.red, size: 52)), const SizedBox(height: 12), Center(child: Text(state.player, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold))), const SizedBox(height: 18), Card(child: ListTile(leading: const Icon(Icons.email), title: const Text('Email ID'), subtitle: Text(state.email.isEmpty ? 'Not added' : state.email))), Card(child: ListTile(leading: const Icon(Icons.phone), title: const Text('Phone number'), subtitle: Text(state.phone.isEmpty ? 'Not added' : state.phone))), StatTile(label: 'Virtual Coins', value: '${state.coins}'), StatTile(label: 'Leaderboard Points', value: '${state.points}'), const SizedBox(height: 10), const Text('Account fields are stored locally in this build.'))])); }
+class ProfilePage extends StatelessWidget {
+  final AppState state;
+
+  const ProfilePage({super.key, required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile & Account')),
+      body: ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          const SizedBox(height: 16),
+          const CircleAvatar(
+            radius: 45,
+            backgroundColor: C.redSoft,
+            child: Icon(Icons.person, color: C.red, size: 52),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              state.player,
+              style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.email),
+              title: const Text('Email ID'),
+              subtitle: Text(state.email.isEmpty ? 'Not added' : state.email),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.phone),
+              title: const Text('Phone number'),
+              subtitle: Text(state.phone.isEmpty ? 'Not added' : state.phone),
+            ),
+          ),
+          StatTile(label: 'Virtual Coins', value: '${state.coins}'),
+          StatTile(label: 'Leaderboard Points', value: '${state.points}'),
+          const SizedBox(height: 10),
+          const Text('Account fields are stored locally in this build.'),
+        ],
+      ),
+    );
+  }
+}
 class StatTile extends StatelessWidget { final String label, value; const StatTile({super.key, required this.label, required this.value}); @override Widget build(BuildContext context) => Card(child: ListTile(title: Text(label), trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: C.red)))); }
 
 class AdminPage extends StatefulWidget { final AppState state; const AdminPage({super.key, required this.state}); @override State<AdminPage> createState() => _AdminPageState(); }
