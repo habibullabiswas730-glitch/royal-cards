@@ -1,7 +1,7 @@
 name: royal_cards_app
-description: Royal Cards - polished virtual coin practice card app.
+description: Royal Cards - online-ready virtual coin card games.
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
