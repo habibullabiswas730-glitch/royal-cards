@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [C.redDark, C.red, Color(0xFFB9121C), C.redDark])),
-        child: SafeArea(child: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(22), child: Column(children: [
+        child: SafeArea(child: Center(child: Column(children: [
           const Icon(Icons.style_rounded, color: C.gold, size: 72),
           const SizedBox(height: 6),
           const Text('ROYAL', style: TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.w900, letterSpacing: 5)),
