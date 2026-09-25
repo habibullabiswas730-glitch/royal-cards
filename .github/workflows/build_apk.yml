@@ -25,7 +25,7 @@ jobs:
         run: cp lib/main.dart /tmp/main.dart
 
       - name: Create Android project
-        run: flutter create --platforms=android --org com.royalcards ...
+        run: flutter create --platforms=android --org com.royalcards.
 
       - name: Add Firebase config
         run: cp google-services.json android/app/google-services.json
