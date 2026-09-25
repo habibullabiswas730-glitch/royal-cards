@@ -24,8 +24,11 @@ jobs:
       - name: Backup app code
         run: cp lib/main.dart /tmp/main.dart
 
-      - name: Create Android project     
-        run: flutter create --platforms=android --org com.royalcards .
+      - name: Create Android project
+        run: flutter create --platforms=android --org com.royalcards ...
+
+      - name: Add Firebase config
+        run: cp google-services.json android/app/google-services.json
 
       - name: Restore app code
         run: cp /tmp/main.dart lib/main.dart
