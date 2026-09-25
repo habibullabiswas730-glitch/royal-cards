@@ -21,16 +21,24 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Backup app code
+        run: cp lib/main.dart /tmp/main.dart
+
       - name: Create Android project
         run: flutter create --platforms=android .
+
+      - name: Restore app code
+        run: cp /tmp/main.dart lib/main.dart
+
       - name: Remove default test
         run: rm -f test/widget_test.dart
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze
-         --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
+
       - name: Build APK
         run: flutter build apk --release
 
