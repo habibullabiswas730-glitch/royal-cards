@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1079718212240",
+    "project_id": "royal-cards-project",
+    "storage_bucket": "royal-cards-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079718212240:android:6ad2f77291d4b7dd135e15",
+        "android_client_info": {
+          "package_name": "com.royalcards.royal_cards_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079718212240-m6mt51rjbsk3n47eufhf3t06129spd71.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.royalcards.royal_cards_app",
+            "certificate_hash": "1e21d44014293dd7422fda31b67791bded433b6c"
+          }
+        },
+        {
+          "client_id": "1079718212240-86vnfd538bqvsrefjt42qp2j8ust9kg6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVmDeQY4nbdbMkll635EfnYgQOyCAI7Ig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079718212240-86vnfd538bqvsrefjt42qp2j8ust9kg6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
