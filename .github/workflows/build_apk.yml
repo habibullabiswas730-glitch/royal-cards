@@ -23,7 +23,8 @@ jobs:
 
       - name: Create Android project
         run: flutter create --platforms=android .
-
+      - name: Remove default Flutter test
+        run: rm -f test/widget_test.dart
       - name: Add Firebase config
         run: |
           mkdir -p android/app
