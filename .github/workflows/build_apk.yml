@@ -23,7 +23,10 @@ jobs:
 
       - name: Create Android project
         run: flutter create --platforms=android --org com.royalcards --project-name royal_cards_app .
-    
+      - name: Fix Kotlin version
+        run: |
+           sed -i "s/id 'org.jetbrains.kotlin.android' version '[^']*'/id 'org.jetbrains.kotlin.android' version '2.1.0'/" android/settings.gradle
+           sed -i 's/id("org.jetbrains.kotlin.android") version "[^"]*"/id("org.jetbrains.kotlin.android") version "2.1.0"/' android/settings.gradle
       - name: Remove default Flutter test
         run: rm -f test/widget_test.dart
       - name: Add Firebase config
