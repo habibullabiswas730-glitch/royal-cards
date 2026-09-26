@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // User accounts
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if isOwner(uid);
+      allow update, delete: if isOwner(uid);
+    }
+
+    // Friends
+    match /friends/{friendId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn();
+    }
+
+    // Online rooms
+    match /rooms/{roomId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid;
+
+      allow update: if signedIn();
+
+      allow delete: if signedIn()
+        && resource.data.ownerId == request.auth.uid;
+
+      // Players inside a room
+      match /players/{playerId} {
+        allow read: if signedIn();
+
+        allow create: if signedIn()
+          && request.auth.uid == playerId;
+
+        allow update, delete: if signedIn()
+          && request.auth.uid == playerId;
+      }
+    }
+
+    // Game invites
+    match /invites/{inviteId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && request.resource.data.fromUid == request.auth.uid;
+
+      allow update: if signedIn();
+
+      allow delete: if signedIn()
+        && (
+          resource.data.fromUid == request.auth.uid ||
+          resource.data.toUid == request.auth.uid
+        );
+    }
+
+    // Leaderboard
+    match /leaderboard/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid);
+      allow delete: if isOwner(uid);
+    }
+  }
+}
