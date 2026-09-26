@@ -23,13 +23,27 @@ jobs:
 
       - name: Create Android project
         run: flutter create --platforms=android --org com.royalcards --project-name royal_cards_app .
-      - name: Get SHA-1
-        shell: bash
+      - name: Create debug keystore
         run: |
-         mkdir -p ~/.android
-         keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias AndroidDebugKey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-         cd android
-         ./gradlew signingReport
+          mkdir -p ~/.config/.android
+             if [ ! -f ~/.config/.android/debug.keystore ]; then
+             keytool -genkeypair -v \
+             -keystore ~/.config/.android/debug.keystore \
+             -storepass android \
+             -keypass android \
+             -alias AndroidDebugKey \
+              -keyalg RSA \
+               -keysize 2048 \
+               -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+             fi
+
+      - name: Get SHA-1
+        run: |
+         keytool -list -v \
+         -keystore ~/.config/.android/debug.keystore \
+         -storepass android \
+          -alias AndroidDebugKey | grep "SHA1:"
       - name: Set Kotlin version                 
         run: |
           sed -i 's/id("org.jetbrains.kotlin.android") version "[^"]*" apply false/id("org.jetbrains.kotlin.android") version "2.2.0" apply false/' android/settings.gradle.kts
