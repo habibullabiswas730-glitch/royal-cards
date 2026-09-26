@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'firebase_service.dart';
+import 'firebase_service.dart' as firebase;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +54,7 @@ class Deck {
 }
 
 class AppState extends ChangeNotifier {
-  final FirebaseService fb = FirebaseService.instance;
+  final firebase.FirebaseService fb = firebase.FirebaseService.instance;
   int coins=517, points=1280; String player='player'; String email='', phone=''; bool loggedIn=false, admin=false;
   final List<String> activity=['Welcome bonus +517'];
   String? uid;
