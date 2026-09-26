@@ -23,6 +23,14 @@ jobs:
 
       - name: Create Android project
         run: flutter create --platforms=android --org com.royalcards --project-name royal_cards_app .
+      - name: Fix Kotlin version
+        run: |
+          SETTINGS=$(find . -path "*/android/settings.gradle" -type f | head -n 1)
+          if [ -z "$SETTINGS" ]; then
+            SETTINGS=$(find . -path "*/android/settings.gradle.kts" -type f | head -n 1)
+          fi
+          echo "Using: $SETTINGS"
+          sed -i -E "s/(org\.jetbrains\.kotlin\.android['\"]?[[:space:]]+version[[:space:]]*['\"])[^'\"]+(['\"])/\12.1.0\2/" "$SETTINGS"
       - name: Remove default Flutter test
         run: rm -f test/widget_test.dart
       - name: Add Firebase config
