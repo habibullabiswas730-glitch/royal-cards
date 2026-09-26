@@ -750,6 +750,8 @@ class _TablePageState extends State<TablePage> {
         _startTimer(myTurn);
 
         final dealtText =
-            game == 'rummy'
-                ? '13 cards dealt'
-                : game == 'teenPatti
+    game == 'rummy'
+        ? '13 cards dealt'
+        : game == 'teenPatti'
+            ? '3 cards dealt'
+            : 'Cards dealt';
