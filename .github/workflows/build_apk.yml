@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,35 +20,28 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Backup app code
-        run: cp lib/main.dart /tmp/main.dart
-
       - name: Create Android project
         run: flutter create --platforms=android --org com.royalcards .
-      - name: Get SHA-1
-        run: |
-         mkdir -p ~/.android
-          keytool -genkeypair -v \
-         -keystore ~/.android/debug.keystore \
-         -storepass android \
-         -alias AndroidDebugKey \
-         -keypass android \
-         -keyalg RSA \
-         -keysize 2048 \
-         -validity 10000 \
-         -dname "CN=Android Debug,O=Android,C=US"
 
-         cd android
-          chmod +x gradlew
-         ./gradlew signingReport
       - name: Add Firebase config
         run: cp google-services.json android/app/google-services.json
 
-      - name: Restore app code
-        run: cp /tmp/main.dart lib/main.dart
-
-      - name: Remove default test
-        run: rm -f test/widget_test.dart
+      - name: Enable Google Services Gradle plugin
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          settings = Path('android/settings.gradle')
+          s = settings.read_text()
+          if 'com.google.gms.google-services' not in s:
+              s = s.replace('plugins {', 'plugins {\n    id "com.google.gms.google-services" version "4.4.2" apply false', 1)
+              settings.write_text(s)
+          app = Path('android/app/build.gradle')
+          a = app.read_text()
+          if 'id "com.google.gms.google-services"' not in a:
+              a = a.replace('plugins {', 'plugins {\n    id "com.google.gms.google-services"', 1)
+              app.write_text(a)
+          PY
 
       - name: Get dependencies
         run: flutter pub get
