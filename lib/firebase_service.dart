@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseService {
-  FirebaseService._();
+  FirebaseService();
 
-  static final FirebaseService instance = FirebaseService._();
+  static final FirebaseService instance = FirebaseService();
 
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
