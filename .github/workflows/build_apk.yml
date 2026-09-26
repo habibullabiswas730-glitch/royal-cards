@@ -28,9 +28,20 @@ jobs:
         run: flutter create --platforms=android --org com.royalcards .
       - name: Get SHA-1
         run: |
-            cd android
-            chmod +x gradlew
-             ./gradlew signingReport
+         mkdir -p ~/.android
+          keytool -genkeypair -v \
+         -keystore ~/.android/debug.keystore \
+         -storepass android \
+         -alias AndroidDebugKey \
+         -keypass android \
+         -keyalg RSA \
+         -keysize 2048 \
+         -validity 10000 \
+         -dname "CN=Android Debug,O=Android,C=US"
+
+         cd android
+          chmod +x gradlew
+         ./gradlew signingReport
       - name: Add Firebase config
         run: cp google-services.json android/app/google-services.json
 
