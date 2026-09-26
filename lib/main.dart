@@ -54,7 +54,7 @@ class Deck {
 }
 
 class AppState extends ChangeNotifier {
-  final FirebaseService fb = FirebaseService.instance;
+  final fb = FirebaseService();
   int coins=517, points=1280; String player='player'; String email='', phone=''; bool loggedIn=false, admin=false;
   final List<String> activity=['Welcome bonus +517'];
   String? uid;
