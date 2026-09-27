@@ -1,31 +1,23 @@
 # Royal Cards
 
-A polished Flutter Android app for virtual-coin card-game practice.
+Flutter Android virtual-coin card-game practice project with Firebase rooms, friends, invites and real-time game state.
 
 ## Included
-- Login / local player profile
-- Persistent virtual coin balance
-- Add/remove virtual coins for testing
-- Practice card game flow and rewards
-- Leaderboard
-- Friends and invite UI
-- Wallet and activity history
-- Profile and settings
-- Responsive Material 3 UI
-- GitHub Actions Android APK build
+- Rummy, Teen Patti, Poker and Andar Bahar practice tables
+- Firebase anonymous authentication
+- User profile with name, email and phone fields
+- Friends and friend requests
+- Online rooms and real-time room players
+- Friend game invites
+- Real-time turn/game-state updates
+- Virtual wallet and activity history
+- Leaderboard screen
+- GitHub Actions APK build
 
-## Build APK
-The repository intentionally does not contain the generated Android folder. The GitHub Actions workflow creates the Android project and builds the APK.
+## Important Firebase setup
+1. Enable **Authentication → Sign-in method → Anonymous** in the `royal-cards-project` Firebase project.
+2. Create/enable **Cloud Firestore**.
+3. Publish `firestore.rules` as the Firestore rules.
+4. Keep `google-services.json` in the project root; the GitHub workflow copies it into `android/app/` after generating the Android folder.
 
-Locally, after installing Flutter:
-
-```bash
-flutter pub get
-flutter create --platforms=android .
-flutter build apk --release
-```
-
-APK output: `build/app/outputs/flutter-apk/app-release.apk`
-
-## Important
-This version is virtual-coins/practice only. It does not implement real-money deposits, withdrawals, gambling, or wagering.
+This project is for virtual coins/practice only. It does not implement real-money deposits, withdrawals, wagering or cash prizes.
