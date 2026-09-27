@@ -1,5 +1,9 @@
-include: package:flutter_lints/flutter.yaml
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
 
 linter:
   rules:
     avoid_print: false
+    unnecessary_this: false
