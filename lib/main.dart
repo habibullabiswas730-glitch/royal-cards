@@ -443,7 +443,10 @@ class FriendsPage extends StatelessWidget {
                               onPressed: () async {
                                 final err = await state.fb.joinRoom(x['roomId'] ?? '');
                                 await state.fb.updateInvite(d.id, err == null ? 'accepted' : 'declined');
-                                if (context.mounted && err == null) Navigator.push(context, MaterialPageRoute(builder: (_) => RoomPage(state: state, roomId: x['roomId'])));
+                                if (context.mounted && err == null) Navigator.push(context, MaterialPageRoute(builder: (_) => rummy.RoomPage(
+  state: state,
+  roomId: x['roomId'],
+)
                               },
                               child: const Text('JOIN'),
                             ),
