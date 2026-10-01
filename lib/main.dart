@@ -204,7 +204,15 @@ class RoomPage extends StatelessWidget {
                     if ((room['status'] ?? '') == 'playing')
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: FilledButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TablePage(state: state, roomId: roomId))), child: const Text('OPEN GAME TABLE')),
+                        builder: (_) => game == GameType.rummy
+    ? rummy.TablePage(
+        state: state,
+        roomId: roomId,
+      )
+    : TablePage(
+        state: state,
+        roomId: roomId,
+      )
                       ),
                   ],
                 );
