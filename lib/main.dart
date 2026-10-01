@@ -100,9 +100,15 @@ class OnlinePage extends StatelessWidget{final AppState state;const OnlinePage({
 class RoomTile extends StatelessWidget{final AppState state;final Map<String,dynamic> data;const RoomTile({super.key,required this.state,required this.data});@override Widget build(BuildContext context){final game=GameTypeX.from(data['game']??'rummy');final id=data['roomId']??'';final members=List<String>.from(data['memberUids']??[]);return Card(child:ListTile(leading:CircleAvatar(child:Icon(game.icon)),title:Text('${game.title} • $id'),subtitle:Text('${members.length}/${data['seats']??6} players • ${data['status']??'waiting'}'),trailing:FilledButton(onPressed:()async{final err=await state.fb.joinRoom(id);if(context.mounted&&err!=null)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(err)));else if(context.mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>RoomPage(state:state,roomId:id)));},child:const Text('JOIN'))));}}
 
 class OnlineGamePage extends StatefulWidget{final AppState state;final GameType game;const OnlineGamePage({super.key,required this.state,required this.game});@override State<OnlineGamePage> createState()=>_OnlineGamePageState();}
-class _OnlineGamePageState extends State<OnlineGamePage>{String? roomId;Future<void> create()async{final id=await widget.state.fb.createRoom(game:widget.game.key,seats:widget.game==GameType.rummy?4:6);if(mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>RoomPage(state:widget.state,roomId:id)));} @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:Text(widget.game.title)),body:ListView(padding:const EdgeInsets.all(18),children:[GameModeCard(game:widget.game,onTap:(){}),const SizedBox(height:10),SizedBox(height:54,child:FilledButton.icon(onPressed:create,icon:const Icon(Icons.add_circle_outline),label:const Text('CREATE ONLINE ROOM'))),const SizedBox(height:12),OutlinedButton.icon(onPressed:()async{final id=await widget.state.fb.createRoom(game:widget.game.key,seats:widget.game==GameType.rummy?4:6);if(mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>RoomPage(state:widget.state,roomId:id)));},icon:const Icon(Icons.flash_on),label:const Text('QUICK MATCH'))]));}
-
-class RoomPage extends StatelessWidget {
+builder: (_) => widget.game == GameType.rummy
+    ? rummy.RoomPage(
+        state: widget.state,
+        roomId: id,
+      )
+    : RoomPage(
+        state: widget.state,
+        roomId: id,
+      )
   final AppState state;
   final String roomId;
   const RoomPage({super.key, required this.state, required this.roomId});
